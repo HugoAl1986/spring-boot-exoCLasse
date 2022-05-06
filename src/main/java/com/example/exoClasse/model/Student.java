@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -31,6 +32,7 @@ public class Student {
 	private Long id;
 	
 	@NotNull
+	@NotBlank
 	@Column(name="name")
 	private String name;
 	

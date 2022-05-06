@@ -1,8 +1,8 @@
 package com.example.exoClasse.exceptions;
 
-public class EmailNotFoundException extends RuntimeException{
+public class ErrorCreateStudentException extends RuntimeException{
 
-	public EmailNotFoundException(String message) {
+	public ErrorCreateStudentException(String message) {
 		
 		super(message);
 		// TODO Auto-generated constructor stub

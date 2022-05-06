@@ -13,13 +13,16 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.exoClasse.exceptions.ErrorCreateStudentException;
 import com.example.exoClasse.model.Student;
+import com.example.exoClasse.model.Subject;
 import com.example.exoClasse.repository.StudentRepository;
 import com.example.exoClasse.service.StudentService;
 
+@RequestMapping("/api/exoclasse")
 @RestController
 public class StudentController {
 	
@@ -30,11 +33,13 @@ public class StudentController {
 	private StudentRepository studentRepository;
 	
 
-	@GetMapping()
+	@GetMapping("/getstudents")
 	public ResponseEntity<List<Student>> getStudents(){
 		return studentService.getStudents();    
 	    
 	}
+	
+	private List<Student> students;
 	
 	@GetMapping("/getStudentByEmail/{email}")
 	public ResponseEntity<Optional<Student>> getStudent(@PathVariable String email){
@@ -44,8 +49,15 @@ public class StudentController {
 	
 	@PostMapping("/createstudent")
 	public ResponseEntity <String> createStudent(@Valid @RequestBody Student student) {
-		studentRepository.save(student);	    
-	    return ResponseEntity.ok("L'étudiant a bien été crée !");
+		try {
+			studentRepository.save(student);
+			return ResponseEntity.ok("L'étudiant a bien été crée !");
+		}
+		catch(RuntimeException e) {
+			throw new ErrorCreateStudentException("L'étudiant n'a pas pu être crée dans la base !!!");
+		}
+		    
+	    
 	}
 	
 	
@@ -53,6 +65,17 @@ public class StudentController {
 	  public ResponseEntity<Object> update(@PathVariable String email, @RequestBody Student payload) {
 	    return studentService.update(email, payload);
 	  }
+	 
+	 @PostMapping("/createsubject")
+	 public ResponseEntity<Subject> createSubject(@Valid @RequestBody Subject subject){
+		 return studentService.createSubject(subject);
+	 }
+	 
+	 @GetMapping("/getAvgAge")
+	 public Double getAvgStudents(){
+		 return studentService.getAvgStudent(students);
+	 }
+	 
 	
 
 }

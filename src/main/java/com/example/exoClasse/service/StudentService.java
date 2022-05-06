@@ -15,39 +15,44 @@ import com.example.exoClasse.exceptions.EmailNotFoundException;
 import com.example.exoClasse.exceptions.GetStudentsException;
 import com.example.exoClasse.exceptions.StudentException;
 import com.example.exoClasse.model.Student;
+import com.example.exoClasse.model.Subject;
 import com.example.exoClasse.repository.StudentRepository;
+import com.example.exoClasse.repository.SubjectRepository;
 
 
 @Service
 public class StudentService {
 	@Autowired
 	private StudentRepository studentRepository;
+	
+	@Autowired
+	private SubjectRepository subjectRepository;
 
 	public ResponseEntity<Object> update(String email, @RequestBody Student payload) {
-    try {
-      final Optional<Student> optionalStudent = studentRepository.findByEmail(email);
-
-      if (optionalStudent.isEmpty()) {
-        throw new StudentException();
-      }
-
-      final Student student = optionalStudent.get();
-
-      if (!payload.getEmail().isEmpty()) {
-        student.setEmail(payload.getEmail());
-      }
-      final Boolean isNameProvided = payload.getName() != null && !payload.getName().isEmpty() && !payload.getName().isBlank();
-      if (isNameProvided) {
-        student.setName(payload.getName());
-      }
-
-      studentRepository.save(student);
-
-      return ResponseEntity.ok(student);
-    }
-    catch (RuntimeException e) {
-      throw new StudentException();
-    }
+	    try {
+	      final Optional<Student> optionalStudent = studentRepository.findByEmail(email);
+	
+	      if (optionalStudent.isEmpty()) {
+	        throw new StudentException();
+	      }
+	
+	      final Student student = optionalStudent.get();
+	
+	      if (!payload.getEmail().isEmpty()) {
+	        student.setEmail(payload.getEmail());
+	      }
+	      final Boolean isNameProvided = payload.getName() != null && !payload.getName().isEmpty() && !payload.getName().isBlank();
+	      if (isNameProvided) {
+	        student.setName(payload.getName());
+	      }
+	
+	      studentRepository.save(student);
+	
+	      return ResponseEntity.ok(student);
+	    }
+	    catch (RuntimeException e) {
+	      throw new StudentException();
+	    }
   }
 	
 	public ResponseEntity<List<Student>> getStudents(){
@@ -64,11 +69,27 @@ public class StudentService {
 		try {	
 			final Optional <Student> student = studentRepository.findByEmail(email);
 			if(student.isEmpty() || student == null) {
-				throw new EmailNotFoundException();			
+				throw new EmailNotFoundException("Cet étudiant n'a pas été trouvé dans la base !!");			
 			}							
 			return ResponseEntity.ok(student);			
 		}catch(RuntimeException e){
-			throw new EmailNotFoundException();			
+			throw new EmailNotFoundException("Cet étudiant n'a pas été trouvé dans la base !!");			
 		}
+		
+	}
+	
+	public ResponseEntity<Subject> createSubject(Subject subject){
+		subjectRepository.save(subject);
+		return ResponseEntity.ok().body(subject);
+	}
+	
+	public Double ageTotal = 0.0;
+	public Double getAvgStudent(List<Student> students) {
+		students = studentRepository.findAll();
+		students.stream().forEach(student -> { 
+			ageTotal = ageTotal + student.getAge(); 
+		});
+		Double avg = ageTotal / (students.toArray().length);
+		return avg;
 	}
 }
